@@ -1,40 +1,52 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<time.h>
-
-typedef struct {
-	int id;
-	char titre[50];
-	char description[100];
-	int deadline[3];
-	char statut[50];
-
-}tache;
-
-//GLOBALES VARIABLES
-tache tab[100];
-int indice = 0;
-
-//declaration fonction
-void trier_alpha();
-void swap(int i, int j);
-void afficher(int a);
-void menu();
-void ajouter(int n);
-int rechercher(int id);
-void modifier(int i_mod);
-void set_start_date(struct tm date[]);
-void trier_deadline();
-time_t temps(int a);
-void set_start_date(struct tm date[]);
-void modifier(int i_mod);
-void days_3();
+#include"todo.h"
 
 //les fonction
 
+void statistiques() {
+	int taches_c = 0;
+	int taches_inc = 0;
+    printf("******Statistiques******\n");
+    printf("Nombre total des tâches : %d\n", indice);
+	for (int i = 0; i < indice; i++) {
+		if (!strcasecmp(tab[i].statut, "Done")) {
+			taches_c++;
+		}
+		else
+			taches_inc++;
+	}
+	printf("Le nombre des tâches complètes : %d\n", taches_c);
+	printf("Le nombre des tâches incomplètes : %d\n", taches_inc);
+	printf("\nChaque tâche avec leur Délai :\n");
+
+	for (int i = 0; i < indice; i++) {
+	int t = temps(i);
+		int j_r = t / (60 * 60 * 24) + 1;
+	afficher(i);
+		printf("Délai : %d\n", j_r);
+	}
+}
+
+int rechercher_par_titre(char r_titre[]){
+	int i;
+		for(i = 0;i<indice;i++){
+		if (!strcasecmp(tab[i].titre, r_titre))
+			return(i);
+        }
+        if (i = indice){
+                printf("titre incorrect\n");
+                return (-1);
+        }
+}
+
+void supprimer(int a){
+    for (int i = a; i < indice; i++){
+        swap(i,i+1);
+    }
+    indice--;
+}
+
 void days_3(){
-    const int three_D = 86400 * 3;
+    int three_D = 86400 * 3;
     for (int i = 0; i < indice; i++){
         if (temps(i) <= three_D){
             afficher(i);
@@ -51,6 +63,7 @@ void trier_deadline(){
         }
     }
 }
+
 time_t temps(int a){
     struct tm date[1];
     time_t currentTime;
@@ -66,7 +79,7 @@ time_t temps(int a){
     return difftime(seconds, currentTime);
 }
 
-void set_start_date(struct tm date[])
+void set_start_date(struct tm date[0])
 {
     date[0].tm_mon -= 1; // Month is 0-based (0 = January, 1 =>
     date[0].tm_year -= 1900; // Years since 1900
@@ -88,16 +101,19 @@ void modifier(int i_mod){
 		printf("Taper l'option : ");
 		scanf("%d", &x);
 		switch(x){
-			case 1:printf("Entrer la nouvelle description : ");
-				scanf("%[^\n]", new_dis);
+			case 1:
+				printf("Entrer la nouvelle description : ");
+				scanf(" %[^\n]", new_dis);
 				strcpy(tab[i_mod].description, new_dis);
 				break;
-			case 2:printf("Entrer le nouvelle statut : ");
-                                scanf("%[^\n]", new_stat);
+			case 2:
+				printf("Entrer le nouvelle statut : ");
+                                scanf(" %[^\n]", new_stat);
                                 strcpy(tab[i_mod].statut, new_stat);
 				break;
-			case 3:printf("Entrer le nouvelle deadline (jj/mm/aaaa) :");
-				scanf("%d/%d/%d",  &tab[indice].deadline[0], &tab[indice].deadline[1], &tab[indice].deadline[2]);
+			case 3:
+				printf("Entrer le nouvelle deadline (jj/mm/aaaa) :");
+				scanf("%d/%d/%d",  &tab[i_mod].deadline[0], &tab[i_mod].deadline[1], &tab[i_mod].deadline[2]);
 				break;
 			default:
 				printf("Invalid option !");
@@ -105,13 +121,14 @@ void modifier(int i_mod){
 			}
 		}
 
-        
-
-int rechercher(int id){
-	for(int i = 0;i<indice;i++){
-	if (tab[i].id == id)
-		return(i);
+int rechercher_par_id(int id){
+	int i;
+	for(i = 0;i<indice;i++){
+		if (tab[i].id == id)
+			return(i);
 	}
+	printf("id incorrect\n");
+	return (-1);
 }
 
 void trier_alpha(){
@@ -157,11 +174,13 @@ void swap( int i, int j){
 }
 
 void afficher(int a){
-        printf("Identifiant (ID): %d\n", tab[a].id);
+	if (a >= 0){
+        printf("\nIdentifiant (ID): %d\n", tab[a].id);
         printf("Titre de tache: %s\n", tab[a].titre);
         printf("Description: %s\n", tab[a].description);
         printf("Deadline: %d/%d/%d\n", tab[a].deadline[0], tab[a].deadline[1], tab[a].deadline[2]);
         printf("statut: %s\n", tab[a].statut);
+	}
 }
 
 void menu()
@@ -178,15 +197,15 @@ void ajouter(int n){
 	int i = 0;
 
 while (i < n){
-	tab[indice].id++;
+	tab[indice].id = indice;
         printf("\nId de tache : %d\nEntrez son titre : ", indice);
-        scanf("%s", tab[indice].titre);
+        scanf(" %[^\n]", tab[indice].titre);
         printf("Entrez une description : ");
-        scanf("%s", tab[indice].description);
+        scanf(" %[^\n]", tab[indice].description);
 	printf("Entrez un deadline (jj/mm/aaaa): ");
         scanf("%d/%d/%d", &tab[indice].deadline[0], &tab[indice].deadline[1], &tab[indice].deadline[2]);
 	printf("Entrez son statut ('To do','Doing','Done'): ");
-        scanf("%s", tab[indice].statut);
+        scanf(" %[^\n]", tab[indice].statut);
         printf("Tâche ajouté avec succès!\n");
 	i++;
 	indice++;
@@ -214,7 +233,7 @@ int main()
 			break;
 		case 3:	printf("\e[1;1H\e[2J");
 			int aff;
-			int i;
+			int i3;
 
 			printf("1.Afficher les tâches trier par ordre alphabétique\n");
 			printf("2.Afficher les tâches trier par deadline.\n");
@@ -223,39 +242,75 @@ int main()
 			scanf(" %d", &aff);
 			switch(aff){
 				case 1:
+					i3=0;
 					trier_alpha();
-					 while(i<indice){
-						afficher(i);
-                        			i++;
+					 while(i3<indice){
+						afficher(i3);
+                        			i3++;
                         			}
 					break;
 				case 2:
-					trier_deadline;
-					 while(i<indice){
-                        			afficher(i);
-                        			i++;
+					i3 = 0;
+					trier_deadline();
+					while(i3<indice){
+                        			afficher(i3);
+                        			i3++;
                         			}
 					break;
 				case 3:
-					//affich 3j;
+					days_3();
 					break;
 				default:
 					printf("Invalid option !");
 					break;
 				}
 			break;
-		case 4:	printf("\e[1;1H\e[2J");
-			printf("Entre");
-			modifier;
-		case 5:	printf("\e[1;1H\e[2J");
-			//supprimer;
-		case 6:	printf("\e[1;1H\e[2J");
-			//rechercher;
-		case 7: printf("\e[1;1H\e[2J");
-			//statistique;
-		default:
-			printf("Invalide fonction\n");
+		case 4:
 			printf("\e[1;1H\e[2J");
+			int i4 = 0;
+			printf("Entrer l'id : ");
+			scanf(" %d",&i4);
+			modifier(rechercher_par_id(i4));
+			break;
+		case 5:
+			printf("\e[1;1H\e[2J");
+			int i5 = 0;
+                        printf("Entrer l'id : ");
+                        scanf(" %d",&i5);
+			supprimer(rechercher_par_id(i5));
+			break;
+		case 6:
+			printf("\e[1;1H\e[2J");
+			printf("1.Rechercher une tâche par son Id.\n");
+			printf("2.Rechercher une tâche par son titre.\n");
+			printf("Taper l'option : ");
+			int i6 = 0;
+			scanf("%d", &i6);
+			switch(i6){
+				case 1:
+					int r;
+					printf("Entrer l'id : ");
+					scanf("%d", &r);
+					afficher(rechercher_par_id(r));
+					break;
+				case 2:
+					char r_titre[50];
+                                        printf("Entrer le titre : ");
+                                        scanf(" %[^\n]", r_titre);
+                                        afficher(rechercher_par_titre(r_titre));
+					break;
+				default :
+					printf("Invalid option !\n");
+					break;
+			}
+			break;
+		case 7:
+			printf("\e[1;1H\e[2J");
+			statistiques();
+                        break;
+		default:
+			printf("\e[1;1H\e[2J");
+			printf("Invalide fonction\n");
 			break;
 	}
 }
