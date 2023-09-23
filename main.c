@@ -1,4 +1,8 @@
-#include"todo.h"
+#include "todo.h"
+
+int indice = 0;
+//GLOBALES VARIABLES
+tache tab[100];
 
 //les fonction
 
@@ -26,70 +30,21 @@ void statistiques() {
 	}
 }
 
-int rechercher_par_titre(char r_titre[]){
-	int i;
-		for(i = 0;i<indice;i++){
-		if (!strcasecmp(tab[i].titre, r_titre))
-			return(i);
-        }
-        if (i = indice){
-                printf("titre incorrect\n");
-                return (-1);
-        }
-}
-
-void supprimer(int a){
-    for (int i = a; i < indice; i++){
-        swap(i,i+1);
-    }
-    indice--;
-}
-
-void days_3(){
-    int three_D = 86400 * 3;
-    for (int i = 0; i < indice; i++){
-        if (temps(i) <= three_D){
-            afficher(i);
-        }
-    }
-}
-
-void trier_deadline(){
-    for(int i = 0 ;i < indice ; i++){
-        for(int j = i+1 ;j < indice ; j++){
-            if(temps(i) > temps(j)){
-                swap(i,j);
-            }
-        }
-    }
-}
-
 time_t temps(int a){
-    struct tm date[1];
+    struct tm date;
     time_t currentTime;
     time_t seconds;
 
     time(&currentTime);
-    date[0].tm_mday = tab[a].deadline[0];
-    date[0].tm_mon = tab[a].deadline[1];
-    date[0].tm_year = tab[a].deadline[2];
+    date.tm_mday = tab[a].deadline[0];
+    date.tm_mon = tab[a].deadline[1] - 1;
+    date.tm_year = tab[a].deadline[2] - 1900;
+    date.tm_hour = 0;
+    date.tm_min = 0;
+    date.tm_sec = 0;
 
-    set_start_date(&date[0]);
-    seconds = mktime(&date[0]);
+    seconds = mktime(&date);
     return difftime(seconds, currentTime);
-}
-
-void set_start_date(struct tm date[0])
-{
-    date[0].tm_mon -= 1; // Month is 0-based (0 = January, 1 =>
-    date[0].tm_year -= 1900; // Years since 1900
-    // Set the remaining fields of the struct tm
-    date[0].tm_hour = 0;
-    date[0].tm_min = 0;
-    date[0].tm_sec = 0;
-    date[0].tm_wday = 0;
-    date[0].tm_yday = 0;
-    date[0].tm_isdst = 0;
 }
 
 void modifier(int i_mod){
@@ -121,58 +76,6 @@ void modifier(int i_mod){
 			}
 		}
 
-int rechercher_par_id(int id){
-	int i;
-	for(i = 0;i<indice;i++){
-		if (tab[i].id == id)
-			return(i);
-	}
-	printf("id incorrect\n");
-	return (-1);
-}
-
-void trier_alpha(){
-    for(int i = 0 ;i < indice ; i++){
-        for(int j = i+1 ;j < indice ; j++){
-            if(strcmp(tab[i].titre, tab[j].titre)>0){
-                swap(i,j);
-            }
-        }
-    }
-}
-
-void swap( int i, int j){
-	tache temp;
-
-	temp.id = tab[i].id;
-	tab[i].id = tab[j].id;
-	tab[j].id = temp.id;
-
-	temp.deadline[0] = tab[i].deadline[0];
-	tab[i].deadline[0] = tab[j].deadline[0];
-	tab[j].deadline[0] = temp.deadline[0];
-
-	temp.deadline[1] = tab[i].deadline[1];
-	tab[i].deadline[1] = tab[j].deadline[1];
-	tab[j].deadline[1] = temp.deadline[1];
-
-	temp.deadline[2] = tab[i].deadline[2];
-	tab[i].deadline[2] = tab[j].deadline[2];
-	tab[j].deadline[2] = temp.deadline[2];
-
-	strcpy(temp.titre,tab[i].titre);
-	strcpy(tab[i].titre,tab[j].titre);
-	strcpy(tab[j].titre,temp.titre);
-
-	strcpy(temp.description,tab[i].description);
-	strcpy(tab[i].description,tab[j].description);
-	strcpy(tab[j].description,temp.description);
-
-	strcpy(temp.statut,tab[i].statut);
-	strcpy(tab[i].statut,tab[j].statut);
-	strcpy(tab[j].statut,temp.statut);
-}
-
 void afficher(int a){
 	if (a >= 0){
         printf("\nIdentifiant (ID): %d\n", tab[a].id);
@@ -197,8 +100,8 @@ void ajouter(int n){
 	int i = 0;
 
 while (i < n){
-	tab[indice].id = indice;
-        printf("\nId de tache : %d\nEntrez son titre : ", indice);
+	tab[indice].id = indice + 101;
+        printf("\nId de tache : %d\nEntrez son titre : ", tab[indice].id);
         scanf(" %[^\n]", tab[indice].titre);
         printf("Entrez une description : ");
         scanf(" %[^\n]", tab[indice].description);
